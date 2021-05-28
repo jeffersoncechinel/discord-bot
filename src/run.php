@@ -16,17 +16,15 @@ $discord = new Discord([
     'token' => $_ENV['DISCORD_TOKEN'],
     'storeMessages' => false,
     'retrieveBans' => false,
-    // 'pmChannels' => false,
     'loop' => Factory::create(),
     'logger' => new Logger('New logger'),
 ]);
 
 $discord->on('ready', function (Discord $discord) {
-
     echo 'Bot is ready!' . PHP_EOL;
 
-    $discord->on(Event::MESSAGE_CREATE, function (Message $message) {
-        CommandsHandler::execute($message);
+    $discord->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord) {
+        (new CommandsHandler($message, $discord))->execute();
     });
 });
 

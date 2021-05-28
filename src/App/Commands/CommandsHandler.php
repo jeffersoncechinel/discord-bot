@@ -1,25 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Commands;
 
+use Discord\Discord;
 use Discord\Parts\Channel\Message;
+use Exception;
+use React\EventLoop\TimerInterface;
+use React\Promise\ExtendedPromiseInterface;
 
 class CommandsHandler
 {
     const COMMAND_PREFIX = '!';
 
-    public static function execute(Message $message)
+    public function __construct(
+        public Message $message,
+        public Discord $discord,
+    ) {
+    }
+
+    public function execute(): bool
     {
-        if (!$cmd = self::getCmd($message)) {
+        if (!$cmd = $this->getCmd()) {
             return false;
         }
 
-        return self::$cmd($message);
+        self::$cmd();
+
+        return true;
     }
 
-    private static function getCmd($message)
+    protected function getCmd(): bool|string
     {
-        $content = $message->content;
+        $content = $this->message->content;
         $cmd = explode(' ', $content);
 
         if (!isset($cmd[0])) {
@@ -33,7 +47,7 @@ class CommandsHandler
         return self::commands()[$cmd[0]];
     }
 
-    public static function commands()
+    protected static function commands(): array
     {
         return [
             self::COMMAND_PREFIX . 'help' => 'help',
@@ -42,30 +56,27 @@ class CommandsHandler
         ];
     }
 
-    private static function help($message)
+    /**
+     * @throws Exception
+     */
+    protected function help(): ExtendedPromiseInterface
     {
-        return $message->channel->sendMessage("{$message->author} I cant help.");
+        return (new Help($this->message))->execute();
     }
 
-    private static function btc($message)
+    /**
+     * @throws Exception
+     */
+    protected function btc(): TimerInterface
     {
-        $btc = file_get_contents('https://www.mercadobitcoin.net/api/btc/ticker');
-        $btc = json_decode($btc, 1);
-
-        $buy = number_format($btc['ticker']['buy'], 8);
-        $sell = number_format($btc['ticker']['sell'], 8);
-
-        return $message->channel->sendMessage("{$message->author} Bitcoin buy: {$buy}  sell: {$sell}");
+        return (new Btc($this->message, $this->discord))->execute();
     }
 
-    private static function xrp($message)
+    /**
+     * @throws Exception
+     */
+    protected function xrp(): ExtendedPromiseInterface
     {
-        $btc = file_get_contents('https://www.mercadobitcoin.net/api/xrp/ticker');
-        $btc = json_decode($btc, 1);
-
-        $buy = number_format($btc['ticker']['buy'], 8);
-        $sell = number_format($btc['ticker']['sell'], 8);
-
-        return $message->channel->sendMessage("{$message->author} XRP buy: {$buy}  sell: {$sell}");
+        return (new Xrp($this->message))->execute();
     }
 }

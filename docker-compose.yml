@@ -1,0 +1,16 @@
+version: '3.2'
+
+services:
+  console:
+    image: jeffersoncechinel/dev-php8-swoole-cli
+    restart: always
+    tty: true
+    stdin_open: true
+    volumes:
+      - ./:/app
+      - ~/.ssh/id_rsa:/root/.ssh/id_rsa
+      - ~/.ssh/id_rsa.pub:/root/.ssh/id_rsa.pub
+networks:
+  default:
+    external:
+      name: dev-network
