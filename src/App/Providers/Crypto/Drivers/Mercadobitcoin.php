@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace App\Providers\Crypto\Drivers;
 
 use App\Providers\Crypto\CryptoInterface;
-use Exception;
 
 class Mercadobitcoin implements CryptoInterface
 {
-    /**
-     * @throws Exception
-     */
+    public function btc(): array
+    {
+        $url = 'https://www.mercadobitcoin.net/api/btc/ticker';
+        $response = $this->request($url);
+
+        return $this->formatValue($response);
+    }
+
     public function xrp(): array
     {
         $url = 'https://www.mercadobitcoin.net/api/xrp/ticker';
@@ -32,13 +36,5 @@ class Mercadobitcoin implements CryptoInterface
         $sell = number_format((float)$response['ticker']['sell'], 8);
 
         return compact('buy', 'sell');
-    }
-
-    public function btc(): array
-    {
-        $url = 'https://www.mercadobitcoin.net/api/btc/ticker';
-        $response = $this->request($url);
-
-        return $this->formatValue($response);
     }
 }
