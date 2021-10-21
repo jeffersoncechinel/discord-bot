@@ -20,6 +20,16 @@ class CommandsHandler
     ) {
     }
 
+    protected static function commands(): array
+    {
+        return [
+            self::COMMAND_PREFIX . 'help' => 'help',
+            self::COMMAND_PREFIX . 'btc' => 'btc',
+            self::COMMAND_PREFIX . 'xrp' => 'xrp',
+            self::COMMAND_PREFIX . 'members' => 'members',
+        ];
+    }
+
     public function execute(): bool
     {
         if (!$cmd = $this->getCmd()) {
@@ -47,15 +57,6 @@ class CommandsHandler
         return self::commands()[$cmd[0]];
     }
 
-    protected static function commands(): array
-    {
-        return [
-            self::COMMAND_PREFIX . 'help' => 'help',
-            self::COMMAND_PREFIX . 'btc' => 'btc',
-            self::COMMAND_PREFIX . 'xrp' => 'xrp',
-        ];
-    }
-
     /**
      * @throws Exception
      */
@@ -78,5 +79,13 @@ class CommandsHandler
     protected function xrp(): ExtendedPromiseInterface
     {
         return (new Xrp($this->message))->execute();
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function members(): ExtendedPromiseInterface
+    {
+        return (new Members($this->message, $this->discord))->execute();
     }
 }

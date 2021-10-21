@@ -14,6 +14,7 @@ $dotenv->safeLoad();
 
 $discord = new Discord([
     'token' => $_ENV['DISCORD_TOKEN'],
+    'loadAllMembers' => true,
     'storeMessages' => false,
     'retrieveBans' => false,
     'loop' => Factory::create(),
